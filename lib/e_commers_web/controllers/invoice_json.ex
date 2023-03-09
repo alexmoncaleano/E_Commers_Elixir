@@ -23,7 +23,7 @@ defmodule ECommersWeb.InvoiceJSON do
     #|> Enum.map(& Map.from_struct(&1))
     #|> Enum.map(& Enum.reduce([:__meta__, :invoices, :inserted_at, :updated_at],
     #&1, fn key, acc -> Map.delete(acc,key) end))
-    #drop_list = [:__meta__, :__struct__, :create_at, :update_at]
+    drop_list = [:__meta__, :__struct__, :invoices, :inserted_at, :updated_at]
     #client = invoice.client |> Map.drop(drop_list)
     client = Clients.get_client!(invoice.client_id)
 
@@ -31,18 +31,15 @@ defmodule ECommersWeb.InvoiceJSON do
     #  product = Products.get_product!(product_id) |> Map.drop(drop_list)
     IO.puts("**********************************************************")
     items = invoice.items
-    |> Enum.map(fn %{products_id, quantity} ->
-    product = Products.get_product!(product_id)
-    %{product: product, quantity: quantity}
-    end)
-
-    IO.inspect(items)
-
+      |> Enum.map(fn %{ "product_id" => product_id, "quantity" => quantity } ->
+       product = Products.get_product!(product_id) |> Map.drop(drop_list)
+       %{ product: product, quantity: quantity }
+        end)
     %{
       id: invoice.id,
       tax: invoice.tax,
       status: invoice.status,
-      items: invoice.items,
+      items: items,
       price: invoice.price,
       client: %{
         id_number: client.id_number,
