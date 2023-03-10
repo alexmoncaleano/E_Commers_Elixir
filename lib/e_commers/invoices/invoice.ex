@@ -10,7 +10,7 @@ defmodule ECommers.Invoices.Invoice do
     field :status, :string
     field :tax, :float
     belongs_to :client, ECommers.Clients.Client
-    #many_to_many :products, ECommers.Products.Product, join_through: "invoice_products"
+    many_to_many :products, ECommers.Products.Product, join_through: "invoice_products"
     timestamps()
   end
 
@@ -18,6 +18,6 @@ defmodule ECommers.Invoices.Invoice do
   def changeset(invoice, attrs) do
     invoice
     |> cast(attrs, [:tax, :status, :items, :price, :client_id])
-    |> validate_required([:tax, :status, :items, :price])
+    |> validate_required([:tax, :status, :items, :price, :client_id])
   end
 end

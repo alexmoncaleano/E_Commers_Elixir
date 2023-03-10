@@ -8,11 +8,11 @@ defmodule ECommers.Repo.Migrations.CreateInvoices do
       add :status, :string
       add :items, {:array, :map}
       add :price, :float
-      add :client_id, references(:clients, on_delete: :delete_all  type: :binary_id)
+      add :client_id, references(:clients, on_delete: :delete_all, type: :binary_id)
 
       timestamps()
     end
 
-    create index(:invoices, [:client_id], :id)
+    create index(:invoices, [:client_id])
   end
 end

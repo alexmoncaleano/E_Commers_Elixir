@@ -7,17 +7,18 @@ defmodule ECommers.InvoicesFixtures do
   @doc """
   Generate a invoice.
   """
-  def invoice_fixture(attrs \\ %{}) do
-    {:ok, invoice} =
-      attrs
-      |> Enum.into(%{
-        items: [],
-        price: 120.5,
-        status: "some status",
-        tax: 120.5
-      })
-      |> ECommers.Invoices.create_invoice()
+  #def invoice_fixture(attrs \\ %{}) do
+  #  {:ok, invoice} =
+  #    attrs
+  #    |> Enum.into(%{
+  #      items: [],
+  #      price: 120.5,
+  #      status: "some status",
+  #      tax: 120.5,
+  #      client_id: "123124124123412341234123"
+  #    })
+  #    |> ECommers.Invoices.create_invoice()
 
-    invoice
-  end
+  #  invoice
+  #end
 end

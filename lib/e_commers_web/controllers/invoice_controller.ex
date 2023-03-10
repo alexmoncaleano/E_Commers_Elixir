@@ -12,17 +12,44 @@ defmodule ECommersWeb.InvoiceController do
   end
 
   def create(conn, %{"invoice" => invoice_params}) do
-    with {:ok, %Invoice{} = invoice} <- Invoices.create_invoice(invoice_params) do
+    #with {:ok, %Invoice{} = invoice} <- Invoices.create_invoice(invoice_params) do
+    invoice = Invoices.create_invoice(invoice_params)
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/invoices/#{invoice}")
       |> render(:show, invoice: invoice)
-    end
+  end
+
+  def new_item(conn, %{"id" => id, "invoice" => invoice_params}) do
+    invoice1 = Invoices.get_invoice!(id)
+    invoice = Invoices.new_item(invoice1, invoice_params)
+    conn
+    |> put_status(:created)
+    |> put_resp_header("location", ~p"/api/invoices/#{invoice}")
+    |> render(:show, invoice: invoice)
+  end
+
+  def delete_item(conn, %{"id" => id, "invoice" => invoice_params}) do
+    invoice1 = Invoices.get_invoice!(id)
+    invoice = Invoices.delete_item(invoice1, invoice_params)
+    conn
+    |> put_status(:ok)
+    |> put_resp_header("location", ~p"/api/invoices/#{invoice}")
+    |> render(:show, invoice: invoice)
+  end
+
+  def pay_invoice(conn, %{"id" => id}) do
+    invoice1 = Invoices.get_invoice!(id)
+    invoice = Invoices.pay_invoice(invoice1)
+    conn
+    |> put_status(:ok)
+    |> put_resp_header("location", ~p"/api/invoices/#{invoice}")
+    |> render(:show, invoice: invoice)
   end
 
   @spec show(Plug.Conn.t(), map) :: Plug.Conn.t()
   def show(conn, %{"id" => id}) do
-    invoice = Invoices.get_invoice!(id) 
+    invoice = Invoices.get_invoice!(id)
     #invoice = ECommers.Invoices.get_invoice!(id) |> Ecto.assoc(:client) |> Repo.preload([:products])
     render(conn, :show, invoice: invoice)
   end
@@ -37,7 +64,6 @@ defmodule ECommersWeb.InvoiceController do
 
   def delete(conn, %{"id" => id}) do
     invoice = Invoices.get_invoice!(id)
-
     with {:ok, %Invoice{}} <- Invoices.delete_invoice(invoice) do
       send_resp(conn, :no_content, "")
     end
