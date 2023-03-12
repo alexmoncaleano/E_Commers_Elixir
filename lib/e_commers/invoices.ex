@@ -6,7 +6,7 @@ defmodule ECommers.Invoices do
   import Ecto.Query, warn: false
   alias ECommers.Repo
   alias ECommers.Products
-
+  alias ECommers.InvoiceProducts
   alias ECommers.Invoices.Invoice
 
   @doc """
@@ -57,11 +57,18 @@ defmodule ECommers.Invoices do
       {:error, %Ecto.Changeset{}}
 
   """
-  def price(attrs) do
+  def product_invoice(invoice)do
+    invoice.items
+    |> Enum.map(fn %{ "product_id" => product_id, "quantity" => quantity } ->
+     InvoiceProducts.create_invoice_product(%{"invoice_id" => invoice.invoice_id, "product_id" => product_id, "quantity" => quantity})
+      end)
+  end
 
+  def price(attrs) do
     items = attrs["items"]
     |> Enum.map(fn %{ "product_id" => product_id, "quantity" => quantity } ->
      product = Products.get_product!(product_id)
+     InvoiceProducts.create_invoice_product(%{"product_id" => product_id, "quantity" => quantity})
      %{ product: product, quantity: quantity }
       end)
     total = Float.floor(Enum.reduce(items, 0.0, fn(item, acc) ->
@@ -80,6 +87,8 @@ defmodule ECommers.Invoices do
     |> Repo.insert!()
     |> Repo.preload(:client)
     |> Repo.preload(:products)
+    product_invoice(Invoice)
+    Invoice
   end
 
   def new_item(%Invoice{} = invoice, attrs) do
